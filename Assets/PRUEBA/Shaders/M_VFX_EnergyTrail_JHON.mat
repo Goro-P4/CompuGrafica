@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: M_VFX_EnergyTrail
+  m_Name: M_VFX_EnergyTrail_JHON
   m_Shader: {fileID: -6465566751694194690, guid: fd1e85897ba54574faf9343e341f0f75, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
