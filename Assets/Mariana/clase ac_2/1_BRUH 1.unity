@@ -24539,7 +24539,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 78dbf733b46c61749b5ab7a2b1b1159d, type: 2}
+  - {fileID: 2100000, guid: 5deea03cfe14c6241ad83b1ff98db6b1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -24783,7 +24783,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0, g: 0.60469866, b: 0.645283, a: 1}
+      maxColor: {r: 0.64705884, g: 0, b: 0.09129533, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -29428,31 +29428,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7455052563442308447, guid: 036ffb35b08df8d5c963f77a784a0323, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.3653214
+      value: 0.81600916
       objectReference: {fileID: 0}
     - target: {fileID: 7455052563442308447, guid: 036ffb35b08df8d5c963f77a784a0323, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.988701
+      value: 1.4116917
       objectReference: {fileID: 0}
     - target: {fileID: 7455052563442308447, guid: 036ffb35b08df8d5c963f77a784a0323, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.6539226
+      value: -0.0729596
       objectReference: {fileID: 0}
     - target: {fileID: 7455052563442308447, guid: 036ffb35b08df8d5c963f77a784a0323, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.57492465
+      value: 0.6999614
       objectReference: {fileID: 0}
     - target: {fileID: 7455052563442308447, guid: 036ffb35b08df8d5c963f77a784a0323, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.40527874
+      value: -0.21298155
       objectReference: {fileID: 0}
     - target: {fileID: 7455052563442308447, guid: 036ffb35b08df8d5c963f77a784a0323, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.7093634
+      value: 0.21801776
       objectReference: {fileID: 0}
     - target: {fileID: 7455052563442308447, guid: 036ffb35b08df8d5c963f77a784a0323, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.044882953
+      value: -0.6458801
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -64264,7 +64264,7 @@ Transform:
   m_GameObject: {fileID: 1141381007}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -64296,7 +64296,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 55a54d3307352b7408ed4d42d8d92663, type: 2}
+  - {fileID: 2100000, guid: 2774e5f1fa8c27947b334bc3014b79a1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -64540,7 +64540,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0, g: 0.60469866, b: 0.645283, a: 1}
+      maxColor: {r: 0.4433962, g: 0, b: 0.03396989, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -118233,7 +118233,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2003624166
 Transform:
   m_ObjectHideFlags: 0
@@ -118275,7 +118275,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8019d8c6f0b23f84b8d779f601715355, type: 2}
+  - {fileID: 2100000, guid: 1650fc306aac31841b7c9fe53250f2d0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -118519,7 +118519,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0, g: 0.6385591, b: 1, a: 0.63529414}
+      maxColor: {r: 0.103773594, g: 0, b: 0.019851236, a: 0.63529414}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
