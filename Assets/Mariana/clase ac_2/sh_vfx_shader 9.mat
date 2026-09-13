@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: sh_vfx_shader 4
+  m_Name: sh_vfx_shader 9
   m_Shader: {fileID: -6465566751694194690, guid: 7cce801538d9ea64e8ba91816d77e24c, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -30,7 +30,7 @@ Material:
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 3000
   stringTagMap:
     RenderType: Transparent
   disabledShaderPasses:
@@ -41,11 +41,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: 6edbe395d32c6b84e800c4edae2b167e, type: 3}
+        m_Texture: {fileID: 2800000, guid: 402273e9c68eee14c957b9c15b1f0685, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _alphamask:
-        m_Texture: {fileID: 2800000, guid: 659cd7db4b9bd0f42844ceb87d1fb648, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6dbded0d040fb8f43a76b47c08f18b73, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -78,9 +78,9 @@ Material:
     - _ZWrite: 0
     - _ZWriteControl: 0
     - _distortionblend: 0
-    - _distortionsettings: 0.387
+    - _distortionsettings: 0
     m_Colors:
-    - _Color: {r: 667.709, g: 667.709, b: 667.709, a: 0.7490196}
+    - _Color: {r: 766.9959, g: 766.9959, b: 766.9959, a: 1}
     - _DISTORTIONSIZE: {r: 1, g: 1, b: 0, a: 0}
     - _softparticles: {r: 0.68, g: 2.62, b: 0, a: 0}
   m_BuildTextureStacks: []
