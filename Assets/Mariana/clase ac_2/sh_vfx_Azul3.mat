@@ -80,7 +80,7 @@ Material:
     - _distortionblend: 0
     - _distortionsettings: 0
     m_Colors:
-    - _Color: {r: 834.87573, g: 1008.5423, b: 47.522907, a: 1}
+    - _Color: {r: 834.87573, g: 1008.5423, b: 47.522907, a: 0.8352941}
     - _DISTORTIONSIZE: {r: 1, g: 1, b: 0, a: 0}
     - _softparticles: {r: 0.68, g: 2.62, b: 0, a: 0}
   m_BuildTextureStacks: []
