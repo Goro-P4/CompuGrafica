@@ -40,9 +40,17 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _COLORPALLET:
+        m_Texture: {fileID: 2800000, guid: 466c39dfd3a89f34a9ffcc463cf34beb, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _Cubemap:
         m_Texture: {fileID: 8900000, guid: 0de556e018e5a2c418f7e2ac8ce97ac1, type: 3}
         m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NORMAL:
+        m_Texture: {fileID: 2800000, guid: 7eae4d68f2aade14cac62ad01e2c65ca, type: 3}
+        m_Scale: {x: 0.2, y: 0.2}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
@@ -61,6 +69,7 @@ Material:
     - _AlphaClip: 0
     - _AlphaToMask: 0
     - _Blend: 0
+    - _BumpStrenght: 0.005
     - _CastShadows: 1
     - _Cull: 1
     - _DstBlend: 10
@@ -74,8 +83,10 @@ Material:
     - _ZWrite: 0
     - _ZWriteControl: 0
     - _circletime: 5
+    - _nodspeed: 1
+    - _normalstring: 1.22
     m_Colors:
-    - _circleparammeters: {r: 0.5, g: 0.02, b: 0, a: 0}
+    - _circleparammeters: {r: 0.66, g: 0.11, b: 0, a: 0}
     - _roughnessparam: {r: 0, g: 10, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
