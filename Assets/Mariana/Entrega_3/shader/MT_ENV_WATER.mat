@@ -26,6 +26,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _MAIN_LIGHT_SHADOWS
+  - _SHADOWS_SOFT
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -68,13 +69,33 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _DepthRange: 1.27
+    - _FoamDistance: 0.6
+    - _FoamScale: 3.1
+    - _FoamSpeed: 3.91
+    - _FoamThreshold: 1.2
     - _MAIN_LIGHT: 0
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _SHADOWS_SOFT: 0
+    - _ReflectionStrength: 0.2
+    - _SHADOWS_SOFT: 1
+    - _SpecularThreshold: 1.31
+    - _Trasnmittancepower: 1.78
+    - _WaveLineScale: -0.05
+    - _WaveLineSpeed: 1.48
+    - _WaveLineWidth: 0.05
+    - _reflectionstrength: 50
+    - _trasnmittancepower: 0
     m_Colors:
+    - _DeepColor: {r: 0.03, g: 0.31999996, b: 0.85, a: 1}
+    - _FoamColor: {r: 1, g: 1, b: 1, a: 1}
+    - _ShallowColor: {r: 0.35999998, g: 0.86, b: 0.95, a: 1}
+    - _absortioncolor: {r: 0.01993183, g: 0.002370916, b: 0.49019608, a: 1}
+    - _deformationparams: {r: 0.1, g: -0.2, b: -10, a: 0.01}
+    - _intersectionparams: {r: 0, g: 0.5, b: 0, a: 0}
     - _normal1_params: {r: 0.1, g: -0.2, b: 10, a: 0.01}
     - _normal2_params: {r: -0.125, g: 0.15, b: 5, a: 0.03}
     - _normal3_params: {r: 0, g: 0.1, b: 0, a: 0.06}
+    - _transmittanseparams: {r: -0.38, g: 7.64, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
