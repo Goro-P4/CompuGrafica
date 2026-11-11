@@ -3,10 +3,11 @@ using UnityEngine;
 namespace FinalVfx
 {
     /// <summary>
-    /// Electric orb made of several Particle Systems plus a Point Light.
-    /// Play() charges the orb (size, emission and light grow), while active it pulses,
-    /// Stop() stops emission and lets the light and brightness fall off.
-    /// The script drives startSize, emission rate and light intensity at runtime.
+    /// Electric orb attack made of several Particle Systems plus a Point Light.
+    /// Entry: the orb charges (size, emission and light grow with a small overshoot).
+    /// Active: it pulses.
+    /// Exit: a release burst (sparks thrown out, light flash) and then the orb collapses.
+    /// The script drives startSize, emission rate and light intensity.
     /// </summary>
     [DisallowMultipleComponent]
     public class OrbEffect : VfxEffectBase
@@ -16,11 +17,17 @@ namespace FinalVfx
         [Header("Parts")]
         [Tooltip("Circle core, sparks with noise and trails, central bolts and smoke.")]
         [SerializeField] private ParticleSystem[] systems = new ParticleSystem[0];
+        [Tooltip("Rest values of each system (same order). Filled by the builder, editable here.")]
+        [SerializeField] private float[] baseStartSizes = new float[0];
+        [SerializeField] private float[] baseEmissionRates = new float[0];
+        [Tooltip("System that throws the release burst (usually the sparks).")]
+        [SerializeField] private ParticleSystem burstSystem;
+        [SerializeField, Min(0)] private int burstCount = 45;
         [SerializeField] private Light pointLight;
         [Tooltip("Peak light intensity when the orb is fully charged.")]
         [SerializeField, Min(0f)] private float lightIntensity = 6f;
 
-        [Header("Charge (Play)")]
+        [Header("Entry: charge")]
         [SerializeField, Min(0.01f)] private float chargeDuration = 1.2f;
         [Tooltip("Size multiplier over the charge (slight overshoot before settling).")]
         [SerializeField] private AnimationCurve chargeSizeCurve = new AnimationCurve(
@@ -38,51 +45,60 @@ namespace FinalVfx
         [Tooltip("How much of the pulse reaches particle size (light and brightness get the full pulse).")]
         [SerializeField, Range(0f, 1f)] private float pulseSizeAmount = 0.5f;
 
-        [Header("Fade (Stop)")]
-        [SerializeField, Min(0.01f)] private float fadeDuration = 0.6f;
-        [Tooltip("Light and brightness multiplier over the fade (exponential-like drop).")]
-        [SerializeField] private AnimationCurve fadeCurve = new AnimationCurve(
-            new Keyframe(0f, 1f, 0f, -2f), new Keyframe(0.45f, 0.38f), new Keyframe(1f, 0f));
-        [Tooltip("Size multiplier over the fade (the core collapses inwards).")]
-        [SerializeField] private AnimationCurve fadeSizeCurve = new AnimationCurve(
-            new Keyframe(0f, 1f), new Keyframe(1f, 0.3f));
+        [Header("Exit: release + collapse")]
+        [SerializeField, Min(0.01f)] private float releaseDuration = 0.7f;
+        [Tooltip("Light and brightness multiplier: flash at the release, then a fast drop.")]
+        [SerializeField] private AnimationCurve releaseIntensityCurve = new AnimationCurve(
+            new Keyframe(0f, 1f), new Keyframe(0.08f, 2.4f), new Keyframe(0.4f, 0.4f), new Keyframe(1f, 0f));
+        [Tooltip("Size multiplier: swells on the release, then the core collapses inwards.")]
+        [SerializeField] private AnimationCurve releaseSizeCurve = new AnimationCurve(
+            new Keyframe(0f, 1f), new Keyframe(0.1f, 1.35f), new Keyframe(1f, 0.1f));
+        [Tooltip("Emission multiplier during the release.")]
+        [SerializeField] private AnimationCurve releaseEmissionCurve = new AnimationCurve(
+            new Keyframe(0f, 1f), new Keyframe(0.5f, 0.15f), new Keyframe(1f, 0f));
 
-        private float[] baseSizes;
-        private float[] baseRates;
         private ParticleSystemRenderer[] renderers;
         private MaterialPropertyBlock block;
         private float lastPulse = 1f;
 
         protected override float StartDuration => chargeDuration;
-        protected override float StopDuration => fadeDuration;
+        protected override float StopDuration => releaseDuration;
 
-        protected override void Awake()
+        protected override void CacheComponents()
         {
             block = new MaterialPropertyBlock();
-            baseSizes = new float[systems.Length];
-            baseRates = new float[systems.Length];
             renderers = new ParticleSystemRenderer[systems.Length];
+            bool missingBase = baseStartSizes.Length != systems.Length || baseEmissionRates.Length != systems.Length;
+            if (missingBase)
+            {
+                baseStartSizes = new float[systems.Length];
+                baseEmissionRates = new float[systems.Length];
+            }
             for (int i = 0; i < systems.Length; i++)
             {
                 if (systems[i] == null) continue;
-                baseSizes[i] = systems[i].main.startSizeMultiplier;
-                baseRates[i] = systems[i].emission.rateOverTimeMultiplier;
                 renderers[i] = systems[i].GetComponent<ParticleSystemRenderer>();
+                if (missingBase)
+                {
+                    baseStartSizes[i] = systems[i].main.startSizeMultiplier;
+                    baseEmissionRates[i] = systems[i].emission.rateOverTimeMultiplier;
+                }
             }
-            base.Awake();
         }
 
         protected override void OnPlay()
         {
             Apply(0f, 0f, 0f);
-            foreach (ParticleSystem ps in systems)
-            {
-                if (ps == null) continue;
-                ps.Clear(true);
-                ps.Play(true);
-            }
+            StartParticles(systems);
         }
 
+        protected override void OnStop()
+        {
+            if (burstSystem != null && burstCount > 0)
+            {
+                burstSystem.Emit(burstCount);
+            }
+        }
 
         protected override void EvaluateStart(float t)
         {
@@ -93,26 +109,24 @@ namespace FinalVfx
         protected override void EvaluateActive(float time)
         {
             lastPulse = LoopCurve(pulseCurve, time, pulseFrequency);
-            float size = 1f + (lastPulse - 1f) * pulseSizeAmount;
-            Apply(size, 1f, lastPulse);
+            Apply(1f + (lastPulse - 1f) * pulseSizeAmount, 1f, lastPulse);
         }
 
         protected override void EvaluateStop(float t)
         {
-            float fade = fadeCurve.Evaluate(t);
-            // emission falls with the light, so the orb thins out instead of popping off
-            Apply(fadeSizeCurve.Evaluate(t), fade, lastPulse * fade);
+            Apply(releaseSizeCurve.Evaluate(t), releaseEmissionCurve.Evaluate(t),
+                lastPulse * releaseIntensityCurve.Evaluate(t));
         }
 
         protected override void ApplyIdle()
         {
             if (pointLight != null) pointLight.intensity = 0f;
-            if (systems == null) return;
-            foreach (ParticleSystem ps in systems)
-            {
-                // remaining particles finish their lifetime naturally
-                if (ps != null) ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
-            }
+            StopParticles(systems);
+        }
+
+        protected override void EditModeSimulate(float dt)
+        {
+            StepParticles(systems, dt);
         }
 
         /// <param name="size">startSize multiplier</param>
@@ -125,11 +139,12 @@ namespace FinalVfx
                 ParticleSystem ps = systems[i];
                 if (ps == null) continue;
                 ParticleSystem.MainModule main = ps.main;
-                main.startSizeMultiplier = baseSizes[i] * Mathf.Max(0f, size);
+                if (i >= baseStartSizes.Length || i >= baseEmissionRates.Length) continue;
+                main.startSizeMultiplier = baseStartSizes[i] * Mathf.Max(0f, size);
                 ParticleSystem.EmissionModule em = ps.emission;
-                em.rateOverTimeMultiplier = baseRates[i] * Mathf.Max(0f, emission);
+                em.rateOverTimeMultiplier = baseEmissionRates[i] * Mathf.Max(0f, emission);
 
-                ParticleSystemRenderer r = renderers[i];
+                ParticleSystemRenderer r = i < renderers.Length ? renderers[i] : null;
                 if (r != null)
                 {
                     r.GetPropertyBlock(block);

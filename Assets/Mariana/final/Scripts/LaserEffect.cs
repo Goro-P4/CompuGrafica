@@ -3,9 +3,10 @@ using UnityEngine;
 namespace FinalVfx
 {
     /// <summary>
-    /// Laser beam drawn with a LineRenderer. Play() extends the beam from the fire point to its
-    /// max length, while active the HDR intensity pulses and the shader keeps scrolling,
-    /// Stop() dissolves the beam and shrinks its width.
+    /// Laser beam attack drawn with a LineRenderer.
+    /// Entry: a short charge at the muzzle (anticipation), then the beam shoots out to max length.
+    /// Active: the HDR intensity pulses while the shader scrolls.
+    /// Exit: the tail detaches from the muzzle and travels forward while the beam dissolves and thins.
     /// </summary>
     [RequireComponent(typeof(LineRenderer))]
     [DisallowMultipleComponent]
@@ -23,14 +24,18 @@ namespace FinalVfx
         [SerializeField] private bool stopAtColliders = true;
         [SerializeField] private LayerMask hitMask = ~0;
 
-        [Header("Extend (Play)")]
-        [SerializeField, Min(0.01f)] private float extendDuration = 0.3f;
-        [Tooltip("Beam length (0..1 of max length) over the extend phase.")]
-        [SerializeField] private AnimationCurve extendCurve = new AnimationCurve(
-            new Keyframe(0f, 0f, 0f, 3.2f), new Keyframe(0.6f, 0.93f, 0.45f, 0.45f), new Keyframe(1f, 1f, 0f, 0f));
-        [Tooltip("Width multiplier over the extend phase (a short overshoot reads as a muzzle flash).")]
-        [SerializeField] private AnimationCurve extendWidthCurve = new AnimationCurve(
-            new Keyframe(0f, 0.2f), new Keyframe(0.35f, 1.45f), new Keyframe(1f, 1f));
+        [Header("Entry: charge + shot")]
+        [SerializeField, Min(0.01f)] private float entryDuration = 0.55f;
+        [Tooltip("Beam length (0..1 of max length). Stays tiny while charging, then shoots out.")]
+        [SerializeField] private AnimationCurve entryLengthCurve = new AnimationCurve(
+            new Keyframe(0f, 0f), new Keyframe(0.42f, 0.04f, 0f, 0f),
+            new Keyframe(0.62f, 0.9f, 2.5f, 0.6f), new Keyframe(1f, 1f, 0f, 0f));
+        [Tooltip("Width multiplier. Grows while charging, overshoots on the shot (muzzle flash).")]
+        [SerializeField] private AnimationCurve entryWidthCurve = new AnimationCurve(
+            new Keyframe(0f, 0.1f), new Keyframe(0.4f, 0.9f), new Keyframe(0.5f, 1.7f), new Keyframe(1f, 1f));
+        [Tooltip("Intensity multiplier. Charge glow climbs, peaks at the shot.")]
+        [SerializeField] private AnimationCurve entryIntensityCurve = new AnimationCurve(
+            new Keyframe(0f, 0.3f), new Keyframe(0.42f, 1.6f), new Keyframe(0.5f, 2.2f), new Keyframe(1f, 1f));
 
         [Header("Active pulse")]
         [Tooltip("Pulses per second.")]
@@ -42,17 +47,20 @@ namespace FinalVfx
         [Tooltip("Width follows the pulse by this fraction (0 = constant width).")]
         [SerializeField, Range(0f, 1f)] private float pulseWidthAmount = 0.18f;
 
-        [Header("Dissolve (Stop)")]
-        [SerializeField, Min(0.01f)] private float stopDuration = 0.45f;
-        [Tooltip("Shader dissolve value (0 = solid, 1 = gone) over the stop phase.")]
+        [Header("Exit: detach + dissolve")]
+        [SerializeField, Min(0.01f)] private float exitDuration = 0.5f;
+        [Tooltip("Where the tail of the beam is (0 = muzzle, 1 = tip). The beam leaves the muzzle.")]
+        [SerializeField] private AnimationCurve exitTailCurve = new AnimationCurve(
+            new Keyframe(0f, 0f, 0f, 0.5f), new Keyframe(1f, 0.85f, 1.6f, 0f));
+        [Tooltip("Shader dissolve value (0 = solid, 1 = gone).")]
         [SerializeField] private AnimationCurve dissolveCurve = new AnimationCurve(
             new Keyframe(0f, 0f, 0f, 0.6f), new Keyframe(1f, 1f, 2.2f, 0f));
-        [Tooltip("Width multiplier over the stop phase.")]
+        [Tooltip("Width multiplier.")]
         [SerializeField] private AnimationCurve shrinkCurve = new AnimationCurve(
-            new Keyframe(0f, 1f), new Keyframe(0.3f, 1.1f), new Keyframe(1f, 0f, -2.5f, 0f));
-        [Tooltip("Intensity multiplier over the stop phase.")]
-        [SerializeField] private AnimationCurve fadeIntensityCurve = new AnimationCurve(
-            new Keyframe(0f, 1.5f), new Keyframe(1f, 0.6f));
+            new Keyframe(0f, 1f), new Keyframe(0.25f, 1.15f), new Keyframe(1f, 0f, -2.5f, 0f));
+        [Tooltip("Intensity multiplier.")]
+        [SerializeField] private AnimationCurve exitIntensityCurve = new AnimationCurve(
+            new Keyframe(0f, 1.6f), new Keyframe(1f, 0.5f));
 
         private LineRenderer line;
         private MaterialPropertyBlock block;
@@ -62,20 +70,19 @@ namespace FinalVfx
 
         public float CurrentLength => currentLength;
 
-        protected override float StartDuration => extendDuration;
-        protected override float StopDuration => stopDuration;
+        protected override float StartDuration => entryDuration;
+        protected override float StopDuration => exitDuration;
 
-        protected override void Awake()
+        protected override void CacheComponents()
         {
             line = GetComponent<LineRenderer>();
             block = new MaterialPropertyBlock();
-            line.positionCount = 2;
-            line.useWorldSpace = true;
-            base.Awake();
         }
 
         protected override void OnPlay()
         {
+            line.positionCount = 2;
+            line.useWorldSpace = true;
             line.enabled = true;
         }
 
@@ -86,9 +93,9 @@ namespace FinalVfx
 
         protected override void EvaluateStart(float t)
         {
-            currentLength = MaxReach() * extendCurve.Evaluate(t);
-            ApplyShape(currentLength, extendWidthCurve.Evaluate(t));
-            ApplyShader(1f + (pulseCurve.Evaluate(0f) - 1f) * t, 0f);
+            currentLength = MaxReach() * entryLengthCurve.Evaluate(t);
+            ApplyShape(0f, currentLength, entryWidthCurve.Evaluate(t));
+            ApplyShader(entryIntensityCurve.Evaluate(t), 0f);
         }
 
         protected override void EvaluateActive(float time)
@@ -96,27 +103,24 @@ namespace FinalVfx
             float pulse = LoopCurve(pulseCurve, time, pulseFrequency);
             pulseValueAtStop = pulse;
             currentLength = MaxReach();
-            ApplyShape(currentLength, 1f + (pulse - 1f) * pulseWidthAmount);
+            ApplyShape(0f, currentLength, 1f + (pulse - 1f) * pulseWidthAmount);
             ApplyShader(pulse, 0f);
         }
 
         protected override void EvaluateStop(float t)
         {
-            // keep following obstacles, but never grow back past the length at stop time
             currentLength = Mathf.Min(lengthAtStop, MaxReach());
-            ApplyShape(currentLength, shrinkCurve.Evaluate(t));
-            ApplyShader(pulseValueAtStop * fadeIntensityCurve.Evaluate(t), dissolveCurve.Evaluate(t));
+            ApplyShape(currentLength * exitTailCurve.Evaluate(t), currentLength, shrinkCurve.Evaluate(t));
+            ApplyShader(pulseValueAtStop * exitIntensityCurve.Evaluate(t), dissolveCurve.Evaluate(t));
         }
 
         protected override void ApplyIdle()
         {
             currentLength = 0f;
-            if (line != null)
-            {
-                ApplyShape(0f, 0f);
-                ApplyShader(0f, 1f);
-                line.enabled = false;
-            }
+            if (line == null || line.positionCount < 2) return;
+            ApplyShape(0f, 0f, 0f);
+            ApplyShader(0f, 1f);
+            line.enabled = false;
         }
 
         private Transform Origin => firePoint != null ? firePoint : transform;
@@ -132,11 +136,12 @@ namespace FinalVfx
             return maxLength;
         }
 
-        private void ApplyShape(float length, float widthScale)
+        private void ApplyShape(float tail, float tip, float widthScale)
         {
             Vector3 start = Origin.position;
-            line.SetPosition(0, start);
-            line.SetPosition(1, start + Origin.forward * length);
+            Vector3 dir = Origin.forward;
+            line.SetPosition(0, start + dir * tail);
+            line.SetPosition(1, start + dir * Mathf.Max(tip, tail));
             line.widthMultiplier = beamWidth * Mathf.Max(0f, widthScale);
         }
 
@@ -146,11 +151,6 @@ namespace FinalVfx
             block.SetFloat(IntensityId, intensity);
             block.SetFloat(DissolveId, dissolve);
             line.SetPropertyBlock(block);
-        }
-
-        private void OnValidate()
-        {
-            maxLength = Mathf.Max(0.1f, maxLength);
         }
 
         private void OnDrawGizmosSelected()

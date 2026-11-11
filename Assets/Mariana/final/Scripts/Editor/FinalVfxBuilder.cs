@@ -60,6 +60,7 @@ namespace FinalVfx.EditorTools
 
             var laser = go.AddComponent<LaserEffect>();
             SetSerialized(laser, "maxLength", 11f);
+            SetLoop(laser, hold: 1.0f, rest: 1.1f, delay: 0f);
 
             WireController("laser", laser);
             SaveScene(scene);
@@ -206,7 +207,11 @@ namespace FinalVfx.EditorTools
             arr.arraySize = list.Length;
             for (int i = 0; i < list.Length; i++) arr.GetArrayElementAtIndex(i).objectReferenceValue = list[i];
             so.FindProperty("pointLight").objectReferenceValue = light;
+            so.FindProperty("burstSystem").objectReferenceValue = sparks;
+            SetFloats(so.FindProperty("baseStartSizes"), System.Array.ConvertAll(list, p => p.main.startSizeMultiplier));
+            SetFloats(so.FindProperty("baseEmissionRates"), System.Array.ConvertAll(list, p => p.emission.rateOverTimeMultiplier));
             so.ApplyModifiedPropertiesWithoutUndo();
+            SetLoop(orb, hold: 1.6f, rest: 1.0f, delay: 0.4f);
 
             WireController("orb", orb);
             SaveScene(scene);
@@ -216,35 +221,156 @@ namespace FinalVfx.EditorTools
         [MenuItem("Tools/Final VFX/3 Build Trail", priority = 22)]
         public static void BuildTrail()
         {
+            const string shader = "Final VFX/SG_StylizedTrail";
             ConfigureTexture("T_TrailStreak.png", srgb: false, TextureWrapMode.Repeat);
-            Material mat = GetOrCreateMaterial("M_StylizedTrail", "Final VFX/SG_StylizedTrail");
-            mat.SetTexture("_StreakTex", LoadTexture("T_TrailStreak.png"));
-            EditorUtility.SetDirty(mat);
+            Material bright = GetOrCreateMaterial("M_StylizedTrail", shader);
+            bright.SetTexture("_StreakTex", LoadTexture("T_TrailStreak.png"));
+            EditorUtility.SetDirty(bright);
+
+            // second, darker material for the trail behind (same shader, lower values)
+            Material dark = GetOrCreateMaterial("M_StylizedTrail_Dark", shader);
+            dark.SetTexture("_StreakTex", LoadTexture("T_TrailStreak.png"));
+            dark.SetColor("_HeadColor", new Color(1.1f, 0.12f, 0.3f));
+            dark.SetColor("_TailColor", new Color(0.02f, 0.22f, 0.3f));
+            dark.SetVector("_StreakScroll", new Vector4(-0.45f, 0f, 0f, 0f));
+            EditorUtility.SetDirty(dark);
+
+            const string particleShader = "Final VFX/SG_OrbAdditive";
+            Material glowMat = OrbMaterial("M_Trail_HeadGlow", particleShader, "T_OrbCircle.png", TextureWrapMode.Clamp, new Color(3.2f, 1.1f, 0.6f));
+            Material sparkMat = OrbMaterial("M_Trail_Sparks", particleShader, "T_OrbSpark.png", TextureWrapMode.Clamp, new Color(2.6f, 0.5f, 0.35f));
 
             Scene scene = OpenOrCreateTestScene();
-            GameObject go = ReplaceObject("Trail Test Object", new Vector3(3.2f, 1.0f, 0f), Quaternion.identity);
-            go.AddComponent<TrailTestMover>();
+            GameObject oldTest = GameObject.Find("Trail Test Object");
+            if (oldTest != null) Object.DestroyImmediate(oldTest);
 
+            GameObject root = ReplaceObject("Trail", new Vector3(3.2f, 1.0f, 0f), Quaternion.identity);
+            var head = new GameObject("Head");
+            head.transform.SetParent(root.transform, false);
+            head.AddComponent<TrailTestMover>();
+
+            TrailRenderer brightTrail = NewTrail(head, "Bright Trail", bright, time: 0.85f, sortingOrder: 1);
+            TrailRenderer darkTrail = NewTrail(head, "Dark Trail", dark, time: 1.3f, sortingOrder: 0);
+            const float width = 0.75f;
+            const float darkWidth = width * 1.35f;
+
+            // head glow: few big soft particles that follow the head (local space)
+            ParticleSystem glow = NewSystem(head, "Head Glow", glowMat);
+            {
+                var main = glow.main;
+                main.startLifetime = new ParticleSystem.MinMaxCurve(0.35f, 0.45f);
+                main.startSpeed = 0f;
+                main.startSize = 0.9f;
+                main.maxParticles = 10;
+                var em = glow.emission;
+                em.rateOverTime = 10f;
+                var shape = glow.shape;
+                shape.enabled = false;
+                var sol = glow.sizeOverLifetime;
+                sol.enabled = true;
+                sol.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(
+                    new Keyframe(0f, 0.3f), new Keyframe(0.3f, 1f), new Keyframe(1f, 0f)));
+                var col = glow.colorOverLifetime;
+                col.enabled = true;
+                col.color = MakeGradient(new[] { (Color.white, 0f), (Color.white, 1f) },
+                    new[] { (0f, 0f), (1f, 0.25f), (0f, 1f) });
+            }
+
+            // sparks left behind in world space, pushed around by noise
+            ParticleSystem sparks = NewSystem(head, "Head Sparks", sparkMat);
+            {
+                var main = sparks.main;
+                main.simulationSpace = ParticleSystemSimulationSpace.World;
+                main.startLifetime = new ParticleSystem.MinMaxCurve(0.4f, 0.8f);
+                main.startSpeed = new ParticleSystem.MinMaxCurve(0.1f, 0.5f);
+                main.startSize = new ParticleSystem.MinMaxCurve(0.05f, 0.18f);
+                main.startColor = new ParticleSystem.MinMaxGradient(new Color(1f, 0.75f, 0.6f), new Color(1f, 0.4f, 0.5f));
+                main.maxParticles = 200;
+                var em = sparks.emission;
+                em.rateOverTime = 36f;
+                var shape = sparks.shape;
+                shape.enabled = true;
+                shape.shapeType = ParticleSystemShapeType.Sphere;
+                shape.radius = 0.12f;
+                var noise = sparks.noise;
+                noise.enabled = true;
+                noise.strength = 1.6f;
+                noise.frequency = 2.2f;
+                noise.damping = true;
+                var col = sparks.colorOverLifetime;
+                col.enabled = true;
+                col.color = MakeGradient(new[] { (Color.white, 0f), (Color.white, 1f) },
+                    new[] { (1f, 0f), (1f, 0.5f), (0f, 1f) });
+            }
+
+            var lightGo = new GameObject("Head Light");
+            lightGo.transform.SetParent(head.transform, false);
+            var light = lightGo.AddComponent<Light>();
+            light.type = LightType.Point;
+            light.color = new Color(1f, 0.55f, 0.4f);
+            light.range = 3f;
+            light.intensity = 0f;
+            light.shadows = LightShadows.None;
+
+            var effect = head.AddComponent<TrailEffect>();
+            var so = new SerializedObject(effect);
+            SetObjects(so.FindProperty("trails"), new Object[] { brightTrail, darkTrail });
+            SetFloats(so.FindProperty("trailWidths"), new[] { width, darkWidth });
+            SetObjects(so.FindProperty("headParticles"), new Object[] { glow, sparks });
+            SetFloats(so.FindProperty("headEmissionRates"), new[] { 10f, 36f });
+            so.FindProperty("headLight").objectReferenceValue = light;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            SetLoop(effect, hold: 2.2f, rest: 0.9f, delay: 0.8f);
+
+            WireController("trail", effect);
+            SaveScene(scene);
+            Debug.Log("[Final VFX] Trail built.");
+        }
+
+        private static TrailRenderer NewTrail(GameObject parent, string name, Material mat, float time, int sortingOrder)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent.transform, false);
             var trail = go.AddComponent<TrailRenderer>();
             trail.sharedMaterial = mat;
-            trail.time = 0.55f;
-            trail.minVertexDistance = 0.04f;
+            trail.time = time;
+            trail.minVertexDistance = 0.03f;
             trail.alignment = LineAlignment.View;
             trail.textureMode = LineTextureMode.Stretch;
             trail.numCapVertices = 4;
+            trail.numCornerVertices = 2;
             trail.emitting = false;
+            trail.sortingOrder = sortingOrder;
             trail.shadowCastingMode = ShadowCastingMode.Off;
             trail.receiveShadows = false;
             trail.widthCurve = new AnimationCurve(
                 new Keyframe(0f, 0.7f), new Keyframe(0.12f, 1f), new Keyframe(1f, 0f, -1.4f, 0f));
             trail.colorGradient = MakeGradient(
-                new[] { (Color.white, 0f), (new Color(0.9f, 0.95f, 1f), 1f) },
-                new[] { (1f, 0f), (0.85f, 0.6f), (0f, 1f) });
+                new[] { (Color.white, 0f), (Color.white, 1f) },
+                new[] { (1f, 0f), (1f, 1f) });
+            return trail;
+        }
 
-            go.AddComponent<TrailEffect>();
-            WireController("trail", go.GetComponent<TrailEffect>());
-            SaveScene(scene);
-            Debug.Log("[Final VFX] Trail built.");
+        private static void SetLoop(Object effect, float hold, float rest, float delay)
+        {
+            var so = new SerializedObject(effect);
+            so.FindProperty("loopAttack").boolValue = true;
+            so.FindProperty("previewInEditMode").boolValue = true;
+            so.FindProperty("holdTime").floatValue = hold;
+            so.FindProperty("restTime").floatValue = rest;
+            so.FindProperty("firstDelay").floatValue = delay;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetFloats(SerializedProperty arr, float[] values)
+        {
+            arr.arraySize = values.Length;
+            for (int i = 0; i < values.Length; i++) arr.GetArrayElementAtIndex(i).floatValue = values[i];
+        }
+
+        private static void SetObjects(SerializedProperty arr, Object[] values)
+        {
+            arr.arraySize = values.Length;
+            for (int i = 0; i < values.Length; i++) arr.GetArrayElementAtIndex(i).objectReferenceValue = values[i];
         }
 
         private static Material OrbMaterial(string name, string shader, string texture, TextureWrapMode wrap, Color tint)
@@ -435,6 +561,13 @@ namespace FinalVfx.EditorTools
         {
             var so = new SerializedObject(target);
             so.FindProperty(field).floatValue = value;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetSerializedBool(Object target, string field, bool value)
+        {
+            var so = new SerializedObject(target);
+            so.FindProperty(field).boolValue = value;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 

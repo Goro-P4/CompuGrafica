@@ -202,29 +202,68 @@ def orb_smoke(size=128):
 
 
 # ---------------------------------------------------------------- trail
-def trail_streak(w=256, h=64):
-    """Long horizontal brush strokes, tiling along U, soft at the borders of V."""
-    img = Image.new("RGBA", (w, h))
-    px = img.load()
-    rng = random.Random(777)
-    strokes = []
-    for _ in range(9):
-        strokes.append((rng.uniform(0.18, 0.82), rng.uniform(0.02, 0.06),
-                        rng.random(), rng.uniform(0.2, 0.55), rng.uniform(0.35, 0.75)))
-    base_noise = [TileNoise(8, 4, 51), TileNoise(16, 8, 52)]
-    for y in range(h):
-        v = (y + 0.5) / h
-        edge = smoothstep(0.0, 0.22, v) * smoothstep(1.0, 0.78, v)
-        for x in range(w):
-            u = (x + 0.5) / w
-            val = 0.1 + 0.22 * fbm(base_noise, u, v)
-            for cy, thick, start, length, gain in strokes:
-                du = (u - start) % 1.0
-                if du < length:
-                    along = math.sin(du / length * math.pi) ** 0.7
-                    val += gauss(v - cy, thick) * along * gain
-            px[x, y] = (255, 255, 255, to_byte(val * edge))
-    save(img, "T_TrailStreak.png")
+def trail_streak(w=512, h=256):
+    """Trail texture: black background, white zigzag strokes of decreasing size and opacity,
+    wrapped horizontally, then a horizontal motion blur and soft erased borders. Tiles along U."""
+    rng = random.Random(2024)
+    canvas = Image.new("L", (w, h), 0)
+    layers = [  # (brush radius px, opacity, number of strokes)
+        (30, 0.16, 2), (18, 0.28, 3), (10, 0.5, 3), (5, 0.95, 4),
+    ]
+    for radius, opacity, count in layers:
+        layer = Image.new("L", (w, h), 0)
+        px = layer.load()
+        for _ in range(count):
+            # zigzag: random points across the whole width, kept away from the borders
+            x = rng.uniform(0, w)
+            pts = []
+            for _ in range(rng.randint(4, 7)):
+                pts.append((x, rng.uniform(h * 0.28, h * 0.72)))
+                x += rng.uniform(w * 0.08, w * 0.22)
+            for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+                steps = int(math.hypot(x1 - x0, y1 - y0) / 2) + 1
+                for i in range(steps + 1):
+                    cx = x0 + (x1 - x0) * i / steps
+                    cy = y0 + (y1 - y0) * i / steps
+                    for yy in range(int(cy - radius), int(cy + radius) + 1):
+                        if not 0 <= yy < h:
+                            continue
+                        for xx in range(int(cx - radius), int(cx + radius) + 1):
+                            d = math.hypot(xx - cx, yy - cy)
+                            if d > radius:
+                                continue
+                            a = (1 - smoothstep(radius * 0.2, radius, d)) * opacity
+                            wx = xx % w  # wrap-around mode, so it tiles
+                            if a * 255 > px[wx, yy]:
+                                px[wx, yy] = int(a * 255)
+        # screen blend: keeps the brightest values of both layers
+        a = canvas.load(); b = layer.load()
+        for yy in range(h):
+            for xx in range(w):
+                va, vb = a[xx, yy] / 255.0, b[xx, yy] / 255.0
+                a[xx, yy] = to_byte(1 - (1 - va) * (1 - vb))
+    # horizontal motion blur with wrap (angle 180, long length)
+    src = canvas.load()
+    blurred = Image.new("L", (w, h))
+    dst = blurred.load()
+    length = 38
+    for yy in range(h):
+        row = [src[xx, yy] for xx in range(w)]
+        acc = sum(row[(xx) % w] for xx in range(-length, length + 1))
+        for xx in range(w):
+            dst[xx, yy] = int(acc / (2 * length + 1))
+            acc += row[(xx + length + 1) % w] - row[(xx - length) % w]
+    blurred = blurred.filter(ImageFilter.GaussianBlur(2))
+    # eraser pass: soften top and bottom and boost contrast a little
+    out = Image.new("RGB", (w, h))
+    bp, op = blurred.load(), out.load()
+    for yy in range(h):
+        v = (yy + 0.5) / h
+        edge = smoothstep(0.12, 0.38, v) * smoothstep(0.88, 0.62, v)
+        for xx in range(w):
+            c = to_byte(clamp01((bp[xx, yy] / 255.0) * 1.3) ** 1.1 * edge)
+            op[xx, yy] = (c, c, c)
+    save(out, "T_TrailStreak.png")
 
 
 if __name__ == "__main__":

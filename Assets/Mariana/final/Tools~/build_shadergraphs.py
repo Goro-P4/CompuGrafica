@@ -391,63 +391,72 @@ def build_orb():
 
 
 # ====================================================================== TRAIL
-def build_trail():
-    g = Graph("SG_StylizedTrail")
+def build_trail(name="SG_StylizedTrail"):
+    """Trail shader: HDR color gradient (Lerp on UV.r), scrolling streak texture,
+    fade towards the tail that is broken up by a scrolling Simple Noise plus the inverted
+    gradient. Two-sided, transparent, alpha clipping."""
+    g = Graph(name)
     p_tex = g.p_tex("Streak Texture", "_StreakTex", main=True)
     p_head = g.p_color("Head Color", "_HeadColor", 3.4, 0.95, 0.55)    # coral
     p_tail = g.p_color("Tail Color", "_TailColor", 0.1, 1.25, 1.1)     # teal
     p_int = g.p_float("Intensity", "_Intensity", 1.0)
-    p_tiling = g.p_vec2("Streak Tiling", "_StreakTiling", 2.5, 1.0)
-    p_scroll = g.p_vec2("Streak Scroll Speed", "_StreakScroll", -1.6, 0.0)
+    p_tiling = g.p_vec2("Streak Tiling", "_StreakTiling", 1.5, 1.0)
+    p_scroll = g.p_vec2("Streak Scroll Speed", "_StreakScroll", -0.65, 0.0)
     p_offset = g.p_vec2("Scroll Offset", "_ScrollOffset", 0.0, 0.0)  # extra offset driven by script
-    p_nscale = g.p_float("Noise Scale", "_NoiseScale", 18.0)
-    p_nspeed = g.p_vec2("Noise Scroll Speed", "_NoiseScrollSpeed", -0.9, 0.25)
-    p_diss = g.p_float("Dissolve", "_Dissolve", 0.0, slider=(0.0, 1.0))
-    p_clip = g.p_float("Alpha Clip", "_AlphaClip", 0.12, slider=(0.0, 1.0))
-    g.default_blocks(clip_threshold=0.12)
+    p_nscale = g.p_float("Dissolve Noise Scale", "_NoiseScale", 24.0)
+    p_nspeed = g.p_vec2("Dissolve Scroll Speed", "_NoiseScrollSpeed", -0.8, 0.15)
+    p_diss = g.p_float("Dissolve", "_Dissolve", 0.0, slider=(0.0, 2.0))
+    p_clip = g.p_float("Alpha Clip", "_AlphaClip", 0.1, slider=(0.0, 1.0))
+    g.default_blocks(clip_threshold=0.1)
 
-    uv = g.uv((-1900, 0))
-    uv_split = g.split((-1650, -500)); g.link(uv, 0, uv_split, 0)
-    t = g.time((-1900, -300))
+    uv = g.uv((-2100, 0))
+    uv_split = g.split((-1850, -500)); g.link(uv, 0, uv_split, 0)
+    t = g.time((-2100, -300))
 
-    # color gradient along the trail (UV.r: 0 = head, 1 = tail)
-    grad = g.lerp((-700, -700))
-    g.link(g.prop_node(p_head, (-950, -800)), 0, grad, 0)
-    g.link(g.prop_node(p_tail, (-950, -650)), 0, grad, 1)
+    # 1. color gradient: Lerp(head, tail, UV.r)
+    grad = g.lerp((-900, -800))
+    g.link(g.prop_node(p_head, (-1150, -900)), 0, grad, 0)
+    g.link(g.prop_node(p_tail, (-1150, -750)), 0, grad, 1)
     g.link(uv_split, 1, grad, 2)
-    vc = g.vertex_color((-700, -350))
-    c1 = g.mul((-450, -600)); g.link(grad, 3, c1, 0); g.link(vc, 0, c1, 1)
-    c2 = g.mul((-250, -550)); g.link(c1, 2, c2, 0); g.link(g.prop_node(p_int, (-450, -350)), 0, c2, 1)
+
+    # 2. streak texture panned with Time * speed (+ script offset)
+    m_scroll = g.mul((-1850, -150)); g.link(t, 0, m_scroll, 0)
+    g.link(g.prop_node(p_scroll, (-2100, -150)), 0, m_scroll, 1)
+    scroll_total = g.add((-1650, -150))
+    g.link(m_scroll, 2, scroll_total, 0); g.link(g.prop_node(p_offset, (-1850, 50)), 0, scroll_total, 1)
+    to_tex = g.tiling_offset((-1450, -150))
+    g.link(uv, 0, to_tex, 0); g.link(g.prop_node(p_tiling, (-1650, 100)), 0, to_tex, 1)
+    g.link(scroll_total, 2, to_tex, 2)
+    tex = g.sample_tex((-1200, -150))
+    g.link(g.prop_node(p_tex, (-1450, -350)), 0, tex, 1); g.link(to_tex, 3, tex, 2)
+
+    # base color = gradient * texture * vertex color * intensity
+    c0 = g.mul((-700, -650)); g.link(grad, 3, c0, 0); g.link(tex, 4, c0, 1)
+    vc = g.vertex_color((-900, -400))
+    c1 = g.mul((-500, -600)); g.link(c0, 2, c1, 0); g.link(vc, 0, c1, 1)
+    c2 = g.mul((-300, -550)); g.link(c1, 2, c2, 0); g.link(g.prop_node(p_int, (-500, -350)), 0, c2, 1)
     g.link(c2, 2, g.base_color, 0)
 
-    # scrolling streak texture
-    m_scroll = g.mul((-1650, -150)); g.link(t, 0, m_scroll, 0)
-    g.link(g.prop_node(p_scroll, (-1900, -150)), 0, m_scroll, 1)
-    scroll_total = g.add((-1500, -250))
-    g.link(m_scroll, 2, scroll_total, 0); g.link(g.prop_node(p_offset, (-1700, -250)), 0, scroll_total, 1)
-    to_tex = g.tiling_offset((-1400, -150))
-    g.link(uv, 0, to_tex, 0); g.link(g.prop_node(p_tiling, (-1650, 50)), 0, to_tex, 1)
-    g.link(scroll_total, 2, to_tex, 2)
-    tex = g.sample_tex((-1150, -150))
-    g.link(g.prop_node(p_tex, (-1400, -350)), 0, tex, 1); g.link(to_tex, 3, tex, 2)
-
-    # noise dissolve weighted by the inverted gradient (tail dissolves first)
-    m_nscroll = g.mul((-1650, 350)); g.link(t, 0, m_nscroll, 0)
-    g.link(g.prop_node(p_nspeed, (-1900, 400)), 0, m_nscroll, 1)
-    to_noise = g.tiling_offset((-1400, 350), tiling=(3.0, 1.0))
+    # 3. dissolve: (scrolling noise + inverted gradient) - gradient - Dissolve
+    m_nscroll = g.mul((-1850, 400)); g.link(t, 0, m_nscroll, 0)
+    g.link(g.prop_node(p_nspeed, (-2100, 450)), 0, m_nscroll, 1)
+    to_noise = g.tiling_offset((-1600, 400))
     g.link(uv, 0, to_noise, 0); g.link(m_nscroll, 2, to_noise, 2)
-    noise = g.simple_noise((-1150, 350))
-    g.link(to_noise, 3, noise, 0); g.link(g.prop_node(p_nscale, (-1400, 600)), 0, noise, 1)
-    inv = g.unary("OneMinus", (-1150, 100), default_in=1.0); g.link(uv_split, 1, inv, 0)
-    field = g.mul((-900, 250)); g.link(noise, 2, field, 0); g.link(inv, 1, field, 1)
-    mask = g.step((-650, 250))
-    g.link(g.prop_node(p_diss, (-900, 450)), 0, mask, 0); g.link(field, 2, mask, 1)
+    noise = g.simple_noise((-1350, 400))
+    g.link(to_noise, 3, noise, 0); g.link(g.prop_node(p_nscale, (-1600, 650)), 0, noise, 1)
+    inv = g.unary("OneMinus", (-1350, 150), default_in=1.0); g.link(uv_split, 1, inv, 0)
+    brighter = g.add((-1100, 300)); g.link(noise, 2, brighter, 0); g.link(inv, 1, brighter, 1)
+    fade = g.sub((-900, 300)); g.link(brighter, 2, fade, 0); g.link(uv_split, 1, fade, 1)
+    dissolved = g.sub((-700, 350)); g.link(fade, 2, dissolved, 0)
+    g.link(g.prop_node(p_diss, (-900, 550)), 0, dissolved, 1)
 
-    vc_split = g.split((-450, -150)); g.link(vc, 0, vc_split, 0)
-    a1 = g.mul((-650, 0)); g.link(tex, 4, a1, 0); g.link(vc_split, 4, a1, 1)
-    a2 = g.mul((-400, 150)); g.link(a1, 2, a2, 0); g.link(mask, 2, a2, 1)
+    # alpha = saturate(texture * dissolve field) * vertex alpha
+    vc_split = g.split((-700, -150)); g.link(vc, 0, vc_split, 0)
+    a1 = g.mul((-500, 150)); g.link(tex, 4, a1, 0); g.link(dissolved, 2, a1, 1)
+    sat = g.unary("Saturate", (-300, 150)); g.link(a1, 2, sat, 0)
+    a2 = g.mul((-100, 150)); g.link(sat, 1, a2, 0); g.link(vc_split, 4, a2, 1)
     g.link(a2, 2, g.alpha, 0)
-    g.link(g.prop_node(p_clip, (-400, 400)), 0, g.alpha_clip, 0)
+    g.link(g.prop_node(p_clip, (-300, 400)), 0, g.alpha_clip, 0)
 
     g.write(SURFACE_TRANSPARENT, ALPHA_BLEND, FACE_BOTH, alpha_clip=True)
 
