@@ -20,16 +20,37 @@ public abstract class VfxEffectBase : MonoBehaviour
     [Range(0f, 1f)] public float progress;
 
     public bool IsPlaying => playing;
+    public bool IsPaused => paused;
 
     bool playing;
+    bool paused;
     float pauseTimer;
     float lastTime;
 
     public void Play()
     {
         playing = true;
+        paused = false;
         progress = 0f;
         OnPlay();
+    }
+
+    public void Pause()
+    {
+        if (!playing || paused) return;
+        paused = true;
+        foreach (ParticleSystem particle in GetComponentsInChildren<ParticleSystem>(true))
+            particle.Pause(true);
+        OnPause();
+    }
+
+    public void Resume()
+    {
+        if (!playing || !paused) return;
+        paused = false;
+        foreach (ParticleSystem particle in GetComponentsInChildren<ParticleSystem>(true))
+            particle.Play(true);
+        OnResume();
     }
 
     public void Stop()
@@ -70,7 +91,7 @@ public abstract class VfxEffectBase : MonoBehaviour
         float dt = Application.isPlaying ? Time.deltaTime : Mathf.Min(now - lastTime, 0.1f);
         lastTime = now;
 
-        if (playing)
+        if (playing && !paused)
         {
             progress += dt / duration;
             if (progress >= 1f)
@@ -80,17 +101,21 @@ public abstract class VfxEffectBase : MonoBehaviour
                 pauseTimer = 0f;
             }
         }
-        else if (loop)
+        else if (!playing && loop)
         {
             pauseTimer += dt;
             if (pauseTimer >= pauseBetweenLoops) Play();
         }
 
-        Apply(progress, dt);
+        if (!paused) Apply(progress, dt);
     }
 
     // cada efecto pone aqui lo que hace cuando arranca el ataque
     protected virtual void OnPlay() { }
+
+    protected virtual void OnPause() { }
+
+    protected virtual void OnResume() { }
 
     // cada efecto aplica sus curvas segun el progress (t) del ataque
     protected abstract void Apply(float t, float dt);

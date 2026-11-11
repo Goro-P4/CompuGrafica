@@ -14848,7 +14848,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrailEffect
   duration: 3.4
   exitStart: 0.75
-  loop: 1
+  loop: 0
   pauseBetweenLoops: 0.7
   progress: 0
   trails:
@@ -20047,7 +20047,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::OrbEffect
   duration: 3.2
   exitStart: 0.78
-  loop: 1
+  loop: 0
   pauseBetweenLoops: 0.9
   progress: 0
   particles:
@@ -30495,7 +30495,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LaserEffect
   duration: 2.6
   exitStart: 0.8
-  loop: 1
+  loop: 0
   pauseBetweenLoops: 1.1
   progress: 0
   maxLength: 11

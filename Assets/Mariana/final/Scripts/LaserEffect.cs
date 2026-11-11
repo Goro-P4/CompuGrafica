@@ -29,6 +29,26 @@ public class LaserEffect : VfxEffectBase
 
     LineRenderer line;
     MaterialPropertyBlock block;
+    bool lineWasEnabledBeforePause;
+
+    protected override void OnPlay()
+    {
+        if (line == null) line = GetComponent<LineRenderer>();
+        line.enabled = true;
+    }
+
+    protected override void OnPause()
+    {
+        if (line == null) line = GetComponent<LineRenderer>();
+        lineWasEnabledBeforePause = line.enabled;
+        line.enabled = false;
+    }
+
+    protected override void OnResume()
+    {
+        if (line == null) line = GetComponent<LineRenderer>();
+        line.enabled = lineWasEnabledBeforePause;
+    }
 
     protected override void Apply(float t, float dt)
     {

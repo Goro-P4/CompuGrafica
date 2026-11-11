@@ -30,7 +30,22 @@ public class TrailEffect : VfxEffectBase
 
     protected override void OnPlay()
     {
+        TrailTestMover mover = GetComponentInParent<TrailTestMover>();
+        if (mover != null) mover.enabled = true;
         foreach (TrailRenderer trail in trails) trail.Clear();
+        foreach (ParticleSystem particle in headParticles) particle.Play();
+    }
+
+    protected override void OnPause()
+    {
+        TrailTestMover mover = GetComponentInParent<TrailTestMover>();
+        if (mover != null) mover.enabled = false;
+    }
+
+    protected override void OnResume()
+    {
+        TrailTestMover mover = GetComponentInParent<TrailTestMover>();
+        if (mover != null) mover.enabled = true;
     }
 
     protected override void Apply(float t, float dt)
