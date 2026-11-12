@@ -203,7 +203,7 @@ TrailRenderer:
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 1
+    widthMultiplier: 0.75
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -277,7 +277,7 @@ TrailRenderer:
   m_MinVertexDistance: 0.03
   m_MaskInteraction: 0
   m_Autodestruct: 0
-  m_Emitting: 0
+  m_Emitting: 1
   m_ApplyActiveColorSpace: 1
 --- !u!1 &135761863
 GameObject:
@@ -1134,7 +1134,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 9
+      scalar: 10.036974
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -10815,7 +10815,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 20
+      scalar: 22.304386
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -14823,7 +14823,7 @@ Transform:
   m_GameObject: {fileID: 919904942}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -1.795088, y: -0.30960175, z: 0.09830883}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -14848,9 +14848,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrailEffect
   duration: 3.4
   exitStart: 0.75
-  loop: 0
+  loop: 1
   pauseBetweenLoops: 0.7
-  progress: 0
+  progress: 0.69788295
   trails:
   - {fileID: 127209254}
   - {fileID: 1349661166}
@@ -15483,7 +15483,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startRotationX:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 0
       minScalar: 0
       maxCurve:
@@ -15536,7 +15536,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startRotationY:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 0
       minScalar: 0
       maxCurve:
@@ -15908,7 +15908,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 24
+      scalar: 26.765265
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -20047,9 +20047,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::OrbEffect
   duration: 3.2
   exitStart: 0.78
-  loop: 0
+  loop: 1
   pauseBetweenLoops: 0.9
-  progress: 0
+  progress: 0.50956726
   particles:
   - {fileID: 135761864}
   - {fileID: 924821887}
@@ -20304,7 +20304,7 @@ TrailRenderer:
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 1
+    widthMultiplier: 1.0125
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -20378,7 +20378,7 @@ TrailRenderer:
   m_MinVertexDistance: 0.03
   m_MaskInteraction: 0
   m_Autodestruct: 0
-  m_Emitting: 0
+  m_Emitting: 1
   m_ApplyActiveColorSpace: 1
 --- !u!1 &1414828720
 GameObject:
@@ -20437,6 +20437,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1422753615}
   - component: {fileID: 1422753614}
+  - component: {fileID: 1422753616}
   m_Layer: 0
   m_Name: Point Light
   m_TagString: Untagged
@@ -20455,7 +20456,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0.65, g: 1, b: 0.25, a: 1}
-  m_Intensity: 0
+  m_Intensity: 6.691316
   m_Range: 4.5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -20524,6 +20525,35 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1291081225}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1422753616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1422753613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!1 &1496680497
 GameObject:
   m_ObjectHideFlags: 0
@@ -21379,7 +21409,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 45
+      scalar: 50.18487
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -30334,6 +30364,63 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!1001 &1629286002
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -5.6755843
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.82861114
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.7070093
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
+      propertyPath: m_Name
+      value: ManequiModel
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
 --- !u!1 &1662420178
 GameObject:
   m_ObjectHideFlags: 0
@@ -30344,6 +30431,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1662420179}
   - component: {fileID: 1662420180}
+  - component: {fileID: 1662420181}
   m_Layer: 0
   m_Name: Head Light
   m_TagString: Untagged
@@ -30377,7 +30465,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 1, g: 0.55, b: 0.4, a: 1}
-  m_Intensity: 0
+  m_Intensity: 2
   m_Range: 3
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -30431,6 +30519,35 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
+--- !u!114 &1662420181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1662420178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!1 &1856374780
 GameObject:
   m_ObjectHideFlags: 0
@@ -30495,9 +30612,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LaserEffect
   duration: 2.6
   exitStart: 0.8
-  loop: 0
+  loop: 1
   pauseBetweenLoops: 1.1
-  progress: 0
+  progress: 0.5477201
   maxLength: 11
   width: 0.5
   pulseSpeed: 20
@@ -30807,10 +30924,10 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: -5.5, y: 3.1, z: 0}
-  - {x: 5.5, y: 3.1, z: 0}
+  - {x: 5.500001, y: 3.1, z: -0.0000013113022}
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 1
+    widthMultiplier: 0.5
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -30919,3 +31036,4 @@ SceneRoots:
   - {fileID: 2031175827}
   - {fileID: 1291081225}
   - {fileID: 1856374781}
+  - {fileID: 1629286002}
