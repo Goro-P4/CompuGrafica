@@ -277,7 +277,7 @@ TrailRenderer:
   m_MinVertexDistance: 0.03
   m_MaskInteraction: 0
   m_Autodestruct: 0
-  m_Emitting: 1
+  m_Emitting: 0
   m_ApplyActiveColorSpace: 1
 --- !u!1 &135761863
 GameObject:
@@ -551,7 +551,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 1.7
+      scalar: 0.17
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -1134,7 +1134,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 10.036974
+      scalar: 0
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -6060,7 +6060,7 @@ ParticleSystem:
           m_PostInfinity: 2
           m_RotationOrder: 4
   EmissionModule:
-    enabled: 1
+    enabled: 0
     serializedVersion: 4
     rateOverTime:
       serializedVersion: 2
@@ -10232,7 +10232,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 1.35
+      scalar: 0.135
       minScalar: 0.8
       maxCurve:
         serializedVersion: 2
@@ -10815,7 +10815,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 22.304386
+      scalar: 0
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -14823,7 +14823,7 @@ Transform:
   m_GameObject: {fileID: 919904942}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.795088, y: -0.30960175, z: 0.09830883}
+  m_LocalPosition: {x: -1.8970771, y: 0.055361427, z: -0.01663402}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -14848,9 +14848,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrailEffect
   duration: 3.4
   exitStart: 0.75
-  loop: 1
+  loop: 0
   pauseBetweenLoops: 0.7
-  progress: 0.69788295
+  progress: 1
   trails:
   - {fileID: 127209254}
   - {fileID: 1349661166}
@@ -15325,7 +15325,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1.25
+      scalar: 0.125
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -15908,7 +15908,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 26.765265
+      scalar: 0
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -20047,9 +20047,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::OrbEffect
   duration: 3.2
   exitStart: 0.78
-  loop: 1
+  loop: 0
   pauseBetweenLoops: 0.9
-  progress: 0.50956726
+  progress: 1
   particles:
   - {fileID: 135761864}
   - {fileID: 924821887}
@@ -20209,7 +20209,7 @@ Transform:
   m_GameObject: {fileID: 1291081223}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.2, y: 0.9, z: 0}
+  m_LocalPosition: {x: -5.358, y: 0.181, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -20220,6 +20220,33 @@ Transform:
   - {fileID: 1422753615}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1291631286 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
+  m_PrefabInstance: {fileID: 1629286002}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1291631288
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291631286}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
+  m_Controller: {fileID: 9100000, guid: 9ad7009ac006e81469d9a3b9b2c859b8, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1349661164
 GameObject:
   m_ObjectHideFlags: 0
@@ -20378,7 +20405,7 @@ TrailRenderer:
   m_MinVertexDistance: 0.03
   m_MaskInteraction: 0
   m_Autodestruct: 0
-  m_Emitting: 1
+  m_Emitting: 0
   m_ApplyActiveColorSpace: 1
 --- !u!1 &1414828720
 GameObject:
@@ -20412,6 +20439,7 @@ MonoBehaviour:
   laser: {fileID: 2031175825}
   orb: {fileID: 1291081224}
   trail: {fileID: 919904944}
+  characterAnimator: {fileID: 1291631288}
 --- !u!4 &1414828722
 Transform:
   m_ObjectHideFlags: 0
@@ -20456,7 +20484,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0.65, g: 1, b: 0.25, a: 1}
-  m_Intensity: 6.691316
+  m_Intensity: 0
   m_Range: 4.5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -20826,7 +20854,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.13
+      scalar: 0.012999999
       minScalar: 0.06
       maxCurve:
         serializedVersion: 2
@@ -21409,7 +21437,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 50.18487
+      scalar: 0
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -26336,7 +26364,7 @@ ParticleSystem:
           m_PostInfinity: 2
           m_RotationOrder: 4
   EmissionModule:
-    enabled: 1
+    enabled: 0
     serializedVersion: 4
     rateOverTime:
       serializedVersion: 2
@@ -30416,10 +30444,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: ManequiModel
       objectReference: {fileID: 0}
+    - target: {fileID: 6806726209669316439, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1291631288}
   m_SourcePrefab: {fileID: 100100000, guid: 86f7c70025ffb134eb5ffcb51c9fe0d9, type: 3}
 --- !u!1 &1662420178
 GameObject:
@@ -30465,7 +30500,7 @@ Light:
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 1, g: 0.55, b: 0.4, a: 1}
-  m_Intensity: 2
+  m_Intensity: 0
   m_Range: 3
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -30612,9 +30647,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LaserEffect
   duration: 2.6
   exitStart: 0.8
-  loop: 1
+  loop: 0
   pauseBetweenLoops: 1.1
-  progress: 0.5477201
+  progress: 1
   maxLength: 11
   width: 0.5
   pulseSpeed: 20
@@ -30923,11 +30958,11 @@ LineRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Positions:
-  - {x: -5.5, y: 3.1, z: 0}
-  - {x: 5.500001, y: 3.1, z: -0.0000013113022}
+  - {x: 3.8500013, y: 0.27, z: -0.4300011}
+  - {x: 5.500001, y: 0.27, z: -0.43000132}
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.5
+    widthMultiplier: 0
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -31020,7 +31055,7 @@ Transform:
   m_GameObject: {fileID: 2031175824}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -5.5, y: 3.1, z: 0}
+  m_LocalPosition: {x: -5.5, y: 0.27, z: -0.43}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

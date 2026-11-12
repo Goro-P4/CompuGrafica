@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 // Base de los 3 efectos.
 // Todo el ataque (entrada, activo y salida) es una sola animacion: "progress" va de 0 a 1
@@ -7,6 +8,9 @@ using UnityEngine;
 [ExecuteAlways]
 public abstract class VfxEffectBase : MonoBehaviour
 {
+    // Notifica tanto el inicio manual como cada reinicio del bucle.
+    public event Action<VfxEffectBase> PlayStarted;
+
     [Header("Animation")]
     [Tooltip("Duracion total del ataque en segundos.")]
     public float duration = 2.5f;
@@ -33,6 +37,7 @@ public abstract class VfxEffectBase : MonoBehaviour
         paused = false;
         progress = 0f;
         OnPlay();
+        PlayStarted?.Invoke(this);
     }
 
     public void Pause()

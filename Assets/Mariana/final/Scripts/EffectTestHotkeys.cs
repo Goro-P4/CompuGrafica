@@ -10,8 +10,11 @@ public class EffectTestHotkeys : MonoBehaviour
     public VfxEffectBase laser;
     public VfxEffectBase orb;
     public VfxEffectBase trail;
+    [Header("Character animation")]
+    public Animator characterAnimator;
 
     readonly string[] effectNames = { "Laser", "Orb", "Trail" };
+    readonly string[] animationStateNames = { "Laser", "Orb", "Trail" };
     VfxEffectBase[] effects;
     Button[] selectionButtons;
     Text statusText;
@@ -21,8 +24,21 @@ public class EffectTestHotkeys : MonoBehaviour
     void Awake()
     {
         effects = new[] { laser, orb, trail };
+        foreach (VfxEffectBase effect in effects)
+            if (effect != null) effect.PlayStarted += OnEffectPlayStarted;
+
+        // El Controller tiene Laser como estado predeterminado; espera al primer clic.
+        if (characterAnimator != null) characterAnimator.speed = 0f;
+
         BuildUI();
         RefreshUI();
+    }
+
+    void OnDestroy()
+    {
+        if (effects == null) return;
+        foreach (VfxEffectBase effect in effects)
+            if (effect != null) effect.PlayStarted -= OnEffectPlayStarted;
     }
 
     void Update()
@@ -32,6 +48,8 @@ public class EffectTestHotkeys : MonoBehaviour
 
     void SelectEffect(int index)
     {
+        if (index < 0 || index >= effects.Length) return;
+
         for (int i = 0; i < effects.Length; i++)
         {
             if (i != index && effects[i] != null && effects[i].IsPlaying)
@@ -39,6 +57,7 @@ public class EffectTestHotkeys : MonoBehaviour
         }
 
         selectedIndex = index;
+        PlaySelected();
         RefreshUI();
     }
 
@@ -47,7 +66,15 @@ public class EffectTestHotkeys : MonoBehaviour
         VfxEffectBase effect = SelectedEffect;
         if (effect == null) return;
 
-        if (effect.IsPaused) effect.Resume();
+        if (effect.IsPaused)
+        {
+            effect.Resume();
+            if (characterAnimator != null)
+            {
+                characterAnimator.speed = 1f;
+                characterAnimator.Play(animationStateNames[selectedIndex], 0, effect.progress);
+            }
+        }
         else effect.Play();
         RefreshUI();
     }
@@ -55,7 +82,19 @@ public class EffectTestHotkeys : MonoBehaviour
     void PauseSelected()
     {
         if (SelectedEffect != null) SelectedEffect.Pause();
+        if (characterAnimator != null) characterAnimator.speed = 0f;
         RefreshUI();
+    }
+
+    void OnEffectPlayStarted(VfxEffectBase effect)
+    {
+        if (characterAnimator == null) return;
+
+        int index = Array.IndexOf(effects, effect);
+        if (index < 0) return;
+
+        characterAnimator.speed = 1f;
+        characterAnimator.Play(animationStateNames[index], 0, 0f);
     }
 
     VfxEffectBase SelectedEffect => effects != null && selectedIndex < effects.Length
